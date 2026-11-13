@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1220">
+<meta name="application-version" content="1.2-beta-two-mobiles">
+<title>Darts 501 Challenge · Beta Online 1.1</title>
+<style>
+:root{--bg:#09111e;--panel:#121f31;--panel2:#1a2b42;--line:#2b405b;--txt:#f4f7fb;--muted:#9fb0c5;--green:#25cf83;--gold:#f2bd4b;--red:#ff6370;--blue:#56a9ff}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--txt);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:radial-gradient(ellipse at 50% -10%,#24405b 0,#0b1524 50%,#070d17 100%)}
+.wrap{max-width:1000px;margin:auto;padding:18px 14px 50px}.brand{text-align:center;margin:8px 0 22px}.brand h1{font-size:clamp(28px,6vw,44px);letter-spacing:2px;margin:0;font-weight:950}.brand h1 span{color:var(--green)}.brand p{margin:5px 0;color:var(--muted);font-size:11px;letter-spacing:4px}
+.panel{background:linear-gradient(145deg,#192a40f5,#101b2bf5);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 18px 45px #0005;margin-bottom:14px}
+h2{margin:0 0 14px;font-size:22px}h3{margin:0 0 8px}.muted,.small{color:var(--muted)}.small{font-size:12px;line-height:1.5}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tile{min-height:130px;text-align:left;color:var(--txt);background:linear-gradient(145deg,#203650,#142338);border:1px solid #39516e;border-radius:17px;padding:18px;cursor:pointer;transition:.15s}.tile:hover{border-color:var(--green);transform:translateY(-2px)}.tile .emoji{font-size:27px;display:block;margin-bottom:9px}.tile strong{display:block;font-size:18px}.tile span{display:block;color:var(--muted);font-size:12px;margin-top:5px}
+button{border:0;border-radius:12px;padding:12px 16px;font-weight:850;font-size:14px;cursor:pointer;background:var(--green);color:#06170f}button:disabled{opacity:.35;cursor:not-allowed}.secondary{background:#2b405b;color:var(--txt)}.gold{background:var(--gold);color:#211600}.danger{background:#572b36;color:#ffe1e4}.hidden{display:none!important}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.between{justify-content:space-between}.back{background:transparent;border:1px solid var(--line);color:var(--txt)}label{display:block;color:var(--muted);font-size:12px;margin:12px 0 6px}input,select{width:100%;min-width:0;padding:12px;border:1px solid var(--line);border-radius:11px;background:#0b1625;color:var(--txt);font-size:16px}input:focus,select:focus{outline:1px solid var(--green)}.field{flex:1;min-width:130px}
+.choice{display:flex;gap:8px;flex-wrap:wrap}.choice button{flex:1;background:#243851;color:var(--txt);border:1px solid var(--line)}.choice button.sel{background:#174832;border-color:var(--green)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.stat{background:#0c1726;border:1px solid var(--line);border-radius:12px;padding:10px}.stat small{display:block;color:var(--muted);font-size:10px;text-transform:uppercase}.stat b{font-size:22px}
+.playergrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.player{border:1px solid var(--line);border-radius:15px;background:#0d1928;padding:14px;min-width:0}.player.active{border-color:var(--green)}.target{font-size:40px;font-weight:950;line-height:1.1;margin:8px 0}.throws{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0;min-height:25px}.dart{background:#253a54;padding:5px 9px;border-radius:8px;font-size:12px}.progress{height:8px;background:#26384e;border-radius:9px;overflow:hidden;margin:10px 0}.progress i{display:block;height:100%;background:var(--green)}
+.notice{padding:12px;border-radius:12px;background:#152b3b;border:1px solid #31536b;margin-top:12px;font-size:13px;line-height:1.5}.notice.good{border-color:#25865b}.notice.bad{border-color:#984550}
+.scoreform{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}.scoreform button{white-space:nowrap}.actions{display:flex;gap:8px;margin-top:10px}.actions>*{flex:1}
+.history{width:100%;border-collapse:collapse;font-size:13px}.history th,.history td{text-align:left;padding:10px 7px;border-bottom:1px solid var(--line)}.history th{color:var(--muted);font-size:10px;text-transform:uppercase}
+.pill{background:#243a52;border-radius:30px;padding:6px 10px;font-size:11px;font-weight:850;color:#d8e9f8}
+.footer{text-align:center;color:#73869e;font-size:11px;margin-top:20px}
+/* Marcador 501 estilo pizarra */
+.match-config{margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:14px;background:#0c1726}
+.dartboard{background:radial-gradient(ellipse at 50% 0%,#24513f,#102b25 58%,#0b1d1a);border:3px solid #795c37;border-radius:18px;padding:16px;box-shadow:inset 0 0 0 2px #c6a46a, inset 0 0 35px #0009;color:#f7f0dc;position:relative;overflow:hidden}
+.dartboard:before{content:"";position:absolute;inset:7px;border:1px dashed #d6c79a55;border-radius:12px;pointer-events:none}
+.score501{font:900 clamp(58px,12vw,92px)/1 Georgia,serif;text-align:center;color:#fff2c8;text-shadow:0 3px 0 #14251c,0 0 18px #fff4;letter-spacing:2px;margin:14px 0}
+.score501-name{text-align:center;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:#d8c99d}.score-row{display:grid;grid-template-columns:1fr 62px;align-items:center;gap:8px}.dart-counter{border-left:1px solid #d9cba077;padding-left:9px;text-align:center;color:#e6d7ac}.dart-counter b{display:block;font-size:24px;color:#fff0c5}.dart-counter small{font-size:9px;letter-spacing:1px}
+.board-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.board-grid.single{grid-template-columns:minmax(0,560px);justify-content:center}
+.board-player{min-width:0}.board-player.active .dartboard{border-color:#36dc91;box-shadow:0 0 0 2px #36dc9144,inset 0 0 35px #0009}
+.board-meta{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:#e1d5ae;border-top:1px solid #d9cba055;padding-top:9px}
+.board-visits{margin-top:10px;display:flex;flex-direction:column;gap:5px;max-height:125px;overflow:auto}
+.board-visit{display:flex;justify-content:space-between;gap:8px;padding:5px 8px;border-radius:6px;background:#06151088;font:700 13px ui-monospace,monospace}
+.board-visit b{color:#f6d98e}.board-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:10px 0}
+.board-stat{background:#0b1723;border:1px solid #375344;border-radius:9px;padding:8px 4px;text-align:center}.board-stat small{display:block;color:#a8bba9;font-size:9px;text-transform:uppercase}.board-stat strong{font-size:17px;color:#fff0c5}
+.visit-entry{margin-top:12px;padding:13px;background:#101d2b;border:1px solid var(--line);border-radius:14px}.visit-entry label{margin-top:0}
+.turn-label{text-align:center;color:var(--green);font-weight:900;letter-spacing:1px;margin:3px 0 8px}
+.legsline{text-align:center;color:#e7d9ae;font-weight:800;margin:0 0 12px}
+
+.achievement{text-align:center;padding:20px 10px;animation:achievementPop .65s ease-out}.achievement-title{font-size:clamp(28px,7vw,48px);font-weight:1000;color:#ffe34f;text-shadow:0 0 22px #ffcf3888;letter-spacing:2px}.achievement-score{font-size:clamp(56px,15vw,100px);font-weight:1000;line-height:1.1;color:#fff}.achievement-darts{font-size:20px;color:#25cf83;font-weight:850;margin:10px}.achievement-stats{line-height:2;color:#dce8f5}@keyframes achievementPop{0%{transform:scale(.55);opacity:0}70%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+.clock-layout{display:flex;align-items:center;gap:14px;margin:12px 0;padding:12px;border:1px solid #34506b;border-radius:14px;background:#0a1624}
+.clock-layout{flex-direction:column;text-align:center}.clock-dartboard{width:min(82vw,390px);min-width:230px;aspect-ratio:1;flex:0 0 auto;filter:drop-shadow(0 5px 8px #0008)}
+.clock-target-copy{min-width:0;flex:1}.clock-target-copy strong{display:block;font-size:clamp(19px,4vw,27px);line-height:1.15;color:#fff0c5}.clock-target-copy span{display:block;color:var(--muted);font-size:12px;margin-top:7px}
+.clock-dartboard svg{display:block;width:100%;height:100%}
+/* Dos dianas de relojito: compactas para que nunca se solapen */
+#gamePlayers.clock-duo .clock-layout{gap:5px;padding:7px;margin:8px 0;min-width:0}
+#gamePlayers.clock-duo .clock-dartboard{width:min(100%,190px);min-width:0;max-width:190px}
+#gamePlayers.clock-duo .clock-target-copy strong{font-size:clamp(16px,3vw,21px)}
+#gamePlayers.clock-duo .clock-target-copy span{font-size:10px}
+/* Marcadores grandes y visuales del entrenamiento Todo al 20 */
+.todo20-counters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:12px 0}
+.todo20-counter{border:1px solid var(--line);border-radius:13px;padding:10px 4px;text-align:center;background:linear-gradient(145deg,#1b3047,#0b1726);min-width:0}
+.todo20-counter small{display:block;font-size:clamp(9px,2vw,11px);font-weight:850;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.todo20-counter b{display:block;font-size:clamp(25px,6vw,36px);line-height:1.15;margin-top:4px;color:#fff}
+.todo20-counter.triple{border-color:#a62e40}.todo20-counter.triple b{color:#ff6675}
+.todo20-counter.double{border-color:#bd8b2d}.todo20-counter.double b{color:#ffd166}
+.todo20-counter.single{border-color:#278b61}.todo20-counter.single b{color:#45e49a}
+.todo20-counter.miss{border-color:#53677e}.todo20-counter.miss b{color:#b8c7d8}
+.todo20-result-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:16px 0}
+.todo20-result{border:1px solid var(--line);border-radius:13px;padding:13px 8px;background:#0b1726;text-align:center}
+.todo20-result small{display:block;color:var(--muted);font-size:11px;font-weight:850;text-transform:uppercase}
+.todo20-result b{display:block;font-size:clamp(30px,8vw,44px);line-height:1.1;margin-top:4px}
+.todo20-result.triple b{color:#ff6675}.todo20-result.double b{color:#ffd166}.todo20-result.single b{color:#45e49a}.todo20-result.miss b{color:#b8c7d8}
+.challenge-box{margin:12px 0;padding:13px;border:1px solid #42617d;border-radius:14px;background:linear-gradient(145deg,#162d43,#0b1726)}.challenge-target{font-size:12px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:1px}.challenge-score{font-size:30px;font-weight:950;color:#fff;margin:2px 0}.challenge-score span{font-size:15px;color:var(--muted);font-weight:700}.challenge-meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px;color:#d2dfed;margin-top:8px}.challenge-box .progress{height:11px;margin:8px 0 4px}.challenge-box .progress i{background:linear-gradient(90deg,#25cf83,#f2bd4b)}.challenge-rules{padding:12px;border-radius:12px;background:#0b1726;border:1px solid var(--line);font-size:12px;line-height:1.6;color:#d5e0ec;margin-top:10px}.challenge-arena{position:relative;overflow:hidden;margin:10px 0 14px;padding:16px 14px 14px;border:1px solid #41617c;border-radius:18px;background:radial-gradient(ellipse at 50% 0%,#254b60 0,#132a40 48%,#0a1726 100%);box-shadow:inset 0 0 30px #0005,0 8px 24px #0003}.challenge-arena:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 25%,#ffffff08 48%,transparent 70%);animation:arenaSweep 4s linear infinite}.challenge-topline{display:flex;justify-content:space-between;align-items:center;gap:8px;color:#c3d7e8;font-size:11px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase}.challenge-lives{font-size:20px;letter-spacing:2px;color:#ff6475;text-shadow:0 0 12px #ff526b55;white-space:nowrap}.challenge-target-number{display:block;text-align:center;font-size:clamp(66px,17vw,104px);font-weight:1000;line-height:1.02;letter-spacing:-3px;color:#fff2bd;text-shadow:0 4px 0 #634b21,0 0 22px #f2bd4b55;margin:5px 0 0;animation:targetPulse 2.8s ease-in-out infinite}.challenge-target-caption{text-align:center;color:#e3c982;font-size:11px;font-weight:900;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}.challenge-current{text-align:center;display:flex;justify-content:center;align-items:baseline;gap:5px;margin:4px 0 10px;color:#d8e8f5}.challenge-current b{font-size:clamp(30px,8vw,44px);font-weight:1000;color:#42efa0;text-shadow:0 0 16px #25cf8366}.challenge-current span{font-size:14px;font-weight:800;color:#b8c9d9}.challenge-track{height:20px;position:relative;border-radius:20px;background:#06111e;border:1px solid #59748b;overflow:visible;margin:20px 4px 13px;box-shadow:inset 0 3px 7px #0009}.challenge-track-fill{height:100%;width:0;border-radius:20px;background:linear-gradient(90deg,#16a66b 0%,#31e99a 62%,#ffe16b 100%);box-shadow:0 0 13px #35eea477;transition:width .85s cubic-bezier(.2,.8,.2,1);position:relative;overflow:hidden}.challenge-track-fill:after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 20%,#ffffff88 48%,transparent 75%);animation:progressShine 1.8s linear infinite}.challenge-marker{position:absolute;top:50%;left:0%;transform:translate(-50%,-50%);font-size:25px;filter:drop-shadow(0 2px 4px #000);transition:left .85s cubic-bezier(.2,.8,.2,1);z-index:2}.challenge-ticks{position:absolute;inset:-4px 0;pointer-events:none;display:flex;justify-content:space-between;padding:0 25%}.challenge-ticks i{width:2px;height:28px;background:#dce8f588;border-radius:2px}.challenge-encourage{text-align:center;font-size:clamp(13px,3.5vw,16px);font-weight:950;color:#fff0bf;letter-spacing:.4px;min-height:23px;text-shadow:0 0 12px #f2bd4b44}.challenge-meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px;color:#d2dfed;margin-top:10px}.challenge-entry{margin-top:12px;padding:13px;border:1px solid #35516b;border-radius:15px;background:#101f30}.challenge-entry label{text-align:center;font-size:13px;font-weight:900;color:#dce9f5;margin:0 0 8px}.challenge-entry input{font-size:24px;text-align:center;font-weight:900;padding:14px}.challenge-entry button{font-size:15px;letter-spacing:.5px}@keyframes progressShine{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}@keyframes targetPulse{0%,100%{text-shadow:0 4px 0 #634b21,0 0 18px #f2bd4b44}50%{text-shadow:0 4px 0 #634b21,0 0 30px #f2bd4baa}}@keyframes arenaSweep{0%{transform:translateX(-110%)}100%{transform:translateX(110%)}}@media(prefers-reduced-motion:reduce){.challenge-arena:after,.challenge-target-number,.challenge-track-fill:after{animation:none}.challenge-track-fill,.challenge-marker{transition:none}}
+@media(max-width:390px){.clock-layout{gap:8px;padding:8px}.clock-dartboard{width:84vw;min-width:0;max-width:340px}.clock-target-copy strong{font-size:22px}}
+@media(max-width:650px){.board-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.dartboard{padding:9px 7px;border-width:2px}.score501{font-size:clamp(34px,8vw,54px);letter-spacing:0;margin:12px 0}.score-row{grid-template-columns:minmax(0,1fr) 42px;gap:4px}.dart-counter{padding-left:4px}.dart-counter b{font-size:17px}.dart-counter small{font-size:7px}.score501-name{font-size:11px;letter-spacing:1px}.board-meta{font-size:8px;gap:3px}.board-visits{max-height:85px}.board-visit{font-size:10px;padding:4px}.board-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;margin:6px 0}.board-stat{padding:5px 2px}.board-stat small{font-size:8px}.board-stat strong{font-size:13px}.visit-entry{padding:8px}.visit-entry .scoreform{grid-template-columns:minmax(0,1fr)}.visit-entry button{width:100%}}
+@media(max-width:650px){.grid,.playergrid{grid-template-columns:1fr}.panel{padding:15px}.tile{min-height:108px}.stats{gap:5px}.stat b{font-size:19px}}
+</style>
+</head>
+<body><main class="wrap">
+<header class="brand"><h1>🎯 DARTS <span>501</span></h1><p>CHALLENGE · PLAY · TRAIN</p></header>
+<section id="home" class="panel">
+ <h2>¿Qué te apetece hacer?</h2>
+ <div class="grid">
+  <button class="tile" onclick="showPlay()"><span class="emoji">🏆</span><strong>JUGAR</strong><span>Compite, supera retos y juega al 501</span></button>
+  <button class="tile" onclick="showTraining()"><span class="emoji">🎯</span><strong>ENTRENAMIENTO</strong><span>Practica y guarda tus mejores marcas</span></button>
+  <button class="tile" onclick="openOnline()"><span class="emoji">🌐</span><strong>JUGAR ONLINE</strong><span>Crea una sala privada o entra con un código</span></button>
+ </div>
+</section>
+<section id="online" class="panel hidden">
+ <div class="row between"><h2>🌐 Jugar online</h2><button class="back" onclick="home()">← Inicio</button></div>
+ <p class="small">Primero elige qué quieres jugar. Después crea una sala privada o entra con el código de otro jugador.</p>
+ <div class="notice" id="onlineStatus">Conectando con Firebase…</div>
+ <label>Tu nombre</label><input id="onlineName" maxlength="18" placeholder="Tu nombre">
+ <h3 style="margin-top:18px">1. Elige modalidad</h3>
+ <div class="grid" id="onlineModes">
+  <button class="tile" data-mode="challenge" onclick="selectOnlineMode('challenge',this)"><span class="emoji">⚡</span><strong>Consigue el objetivo</strong><span>Sube niveles y administra tus vidas</span></button>
+  <button class="tile" data-mode="501" onclick="selectOnlineMode('501',this)"><span class="emoji">🎯</span><strong>501</strong><span>Partida clásica por turnos</span></button>
+  <button class="tile" data-mode="clock-simple" onclick="selectOnlineMode('clock-simple',this)"><span class="emoji">🕒</span><strong>Relojito Simple</strong><span>Del 1 al Bull</span></button>
+  <button class="tile" data-mode="clock-double" onclick="selectOnlineMode('clock-double',this)"><span class="emoji">🎯</span><strong>Relojito Doble</strong><span>Dobles del 1 al Bull</span></button>
+  <button class="tile" data-mode="clock-triple" onclick="selectOnlineMode('clock-triple',this)"><span class="emoji">🔥</span><strong>Relojito Triple</strong><span>Triples del 1 al Bull</span></button>
+  <button class="tile" data-mode="drill-180" onclick="selectOnlineMode('drill-180',this)"><span class="emoji">💯</span><strong>Entrenamiento 180</strong><span>Consigue 180 exactos</span></button>
+  <button class="tile" data-mode="drill-170" onclick="selectOnlineMode('drill-170',this)"><span class="emoji">🏹</span><strong>Entrenamiento 170</strong><span>Consigue 170 exactos</span></button>
+  <button class="tile" data-mode="drill-125Bull" onclick="selectOnlineMode('drill-125Bull',this)"><span class="emoji">🔴</span><strong>125 Bull</strong><span>Entrenamiento al Bull</span></button>
+  <button class="tile" data-mode="drill-TopTopTop" onclick="selectOnlineMode('drill-TopTopTop',this)"><span class="emoji">👑</span><strong>Top Top Top</strong><span>Tres dobles 20</span></button>
+  <button class="tile" data-mode="drill-Todo al 20" onclick="selectOnlineMode('drill-Todo al 20',this)"><span class="emoji">🎯</span><strong>Todo al 20</strong><span>30 dardos de precisión</span></button>
+ </div>
+ <div id="onlineActions" class="hidden">
+  <h3 style="margin-top:18px">2. Crea o únete a una sala</h3>
+  <div class="grid">
+   <button class="tile" onclick="createOnlineRoom()"><span class="emoji">➕</span><strong>Crear sala</strong><span>Genera un código para invitar</span></button>
+   <div class="tile"><label for="joinCode">Código de invitación</label><input id="joinCode" maxlength="6" autocapitalize="characters" placeholder="ABC123"><button style="width:100%;margin-top:8px" onclick="joinOnlineRoom()">Unirme</button></div>
+  </div>
+ </div>
+ <div id="roomPanel" class="notice hidden">
+  <h3 id="roomTitle">Sala creada</h3>
+  <div class="target" id="roomCode" style="text-align:center;letter-spacing:6px"></div>
+  <p id="roomModeLabel" style="text-align:center;font-weight:800"></p>
+  <div class="row"><button class="gold" onclick="copyRoomCode()">Copiar código</button><button class="secondary" onclick="leaveOnlineRoom()">Salir de sala</button></div>
+  <div id="roomPlayers" style="margin-top:12px"></div>
+  <p class="small" id="roomHint">Esperando al segundo jugador…</p>
+ </div>
+ <p class="small" style="margin-top:14px">Esta versión sirve para comprobar desde dos móviles la selección de modalidad, la creación de salas y la entrada mediante código. La partida sincronizada (turnos, puntuaciones y progreso) se activará en la siguiente fase; todavía no se debe usar como marcador oficial.</p>
+</section>
+<section id="play" class="panel hidden">
+ <div class="row between"><h2>Jugar</h2><button class="back" onclick="home()">← Inicio</button></div>
+ <div class="grid">
+  <button class="tile" onclick="setupChallenge()"><span class="emoji">⚡</span><strong>Consigue el objetivo</strong><span>Sube de nivel, administra tus vidas y supera objetivos aleatorios</span></button>
+  <button class="tile" onclick="setup501()"><span class="emoji">🎯</span><strong>501</strong><span>El clásico 501 · media por jugador</span></button>
+  <button class="tile" onclick="showClockMenu()"><span class="emoji">🕒</span><strong>Relojito</strong><span>Simple · Doble · Triple</span></button>
+ </div>
+</section>
+<section id="training" class="panel hidden">
+ <div class="row between"><h2>Entrenamiento</h2><button class="back" onclick="home()">← Inicio</button></div>
+ <div class="grid">
+  <button class="tile" onclick="setupDrill('180')"><span class="emoji">💯</span><strong>180</strong><span>Consigue 180 exactos con tres dardos en una misma tirada.</span></button>
+  <button class="tile" onclick="setupDrill('170')"><span class="emoji">🔥</span><strong>170</strong><span>Consigue 170 exactos con tres dardos en una misma tirada.</span></button>
+  <button class="tile" onclick="setupDrill('125Bull')"><span class="emoji">🔴</span><strong>125Bull</strong><span>Consigue 125 exactos en tres dardos, solo bull (25 o 50).</span></button>
+  <button class="tile" onclick="setupDrill('TopTopTop')"><span class="emoji">🎯</span><strong>TopTopTop</strong><span>Tres D20 en la misma tirada de tres dardos.</span></button>
+  <button class="tile" onclick="setupDrill('Todo al 20')"><span class="emoji">🎯</span><strong>Todo al 20</strong><span>10 rondas · 30 dardos · cuenta T20, D20, S20 y fallos.</span></button>
+ </div>
+</section>
+<section id="clockMenu" class="panel hidden">
+ <div class="row between"><h2>Relojito</h2><button class="back" onclick="showPlay()">← Volver</button></div>
+ <div class="grid">
+  <button class="tile" onclick="setupClock('Simple')"><span class="emoji">1️⃣</span><strong>Simple</strong><span>Sencillos del 1 al 20 y bull</span></button>
+  <button class="tile" onclick="setupClock('Doble')"><span class="emoji">2️⃣</span><strong>Doble</strong><span>Dobles del 1 al 20 y doble bull</span></button>
+  <button class="tile" onclick="setupClock('Triple')"><span class="emoji">3️⃣</span><strong>Triple</strong><span>Triples del 1 al 20 y doble bull</span></button>
+ </div>
+</section>
+<section id="setup" class="panel hidden">
+ <div class="row between"><h2 id="setupTitle">Configurar partida</h2><button class="back" onclick="backToMenu()">← Volver</button></div>
+ <div class="small" id="setupDescription"></div>
+ <label>Jugadores</label><div class="choice"><button id="one" class="sel" onclick="setCount(1)">1 jugador</button><button id="two" onclick="setCount(2)">2 jugadores</button></div>
+ <div class="grid">
+  <div><label>Nombre jugador 1</label><input id="p1name" maxlength="18" value="Jugador 1"></div>
+  <div id="p2wrap" class="hidden"><label>Nombre jugador 2</label><input id="p2name" maxlength="18" value="Jugador 2"></div>
+ </div>
+ <div id="matchConfig" class="match-config hidden">
+  <label for="bestOf">Jugar al mejor de</label>
+  <select id="bestOf"><option value="1">1 partida</option><option value="3" selected>3 partidas</option><option value="5">5 partidas</option><option value="7">7 partidas</option><option value="9">9 partidas</option><option value="11">11 partidas</option><option value="13">13 partidas</option><option value="15">15 partidas</option><option value="17">17 partidas</option></select>
+  <div class="small" style="margin-top:6px">Solo números impares, para que siempre haya un ganador.</div>
+ </div>
+ <button class="start" style="width:100%;margin-top:18px" onclick="startMode()">COMENZAR</button>
+</section>
+<section id="game" class="hidden">
+ <div class="row between" style="margin-bottom:12px"><span class="pill" id="gameMode"></span><button class="secondary" onclick="quitGame()">Salir</button></div>
+ <div id="gameInfo" class="panel"></div><div id="gamePlayers" class="playergrid"></div><div id="gameResult" class="panel hidden"></div>
+</section>
+<section id="history" class="panel hidden">
+ <div class="row between"><h2>Historial de marcas</h2><button class="back" onclick="backToMenu()">← Volver</button></div>
+ <div id="historyBody"></div>
+</section>
+<div class="footer">Darts 501 Challenge · Beta Online 1.2 · Prueba con dos móviles</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let mode='',submode='',count=1,players=[],gameEnded=false,challengeBase=100,challengeTurn=0,bestOf=3,legsToWin=2,active501=0,matchFinished=false;
+const sections=['home','online','play','training','clockMenu','setup','game','history'];
+function show(id){sections.forEach(s=>$(s).classList.toggle('hidden',s!==id))}
+function home(){show('home')}
+function showPlay(){show('play')}
+function showTraining(){show('training')}
+function showClockMenu(){show('clockMenu')}
+function backToMenu(){if(mode==='challenge'||mode==='501'||mode==='clock')show('play');else show('training')}
+function setCount(n){count=n;$('one').classList.toggle('sel',n===1);$('two').classList.toggle('sel',n===2);$('p2wrap').classList.toggle('hidden',n===1)}
+function config(m,sub,title,desc){mode=m;submode=sub;setCount(1);$('setupTitle').textContent=title;$('setupDescription').textContent=desc;$('p1name').value='Jugador 1';$('p2name').value='Jugador 2';$('matchConfig').classList.toggle('hidden',m!=='501');show('setup')}
+function setupChallenge(){config('challenge','', 'Consigue el objetivo','Alcanza el objetivo de cada nivel sumando la puntuación de tus tres dardos.')}
+function setup501(){config('501','', 'Partida 501','Elige el número de jugadores y el formato de partidas. Introduce la suma de cada visita de tres dardos.')}
+function setupClock(s){config('clock',s,'Relojito · '+s,'Introduce la puntuación de cada dardo. Solo avanzas cuando la puntuación corresponde exactamente al segmento indicado.')}
+function setupDrill(s){let d={180:'Consigue exactamente 180 puntos en una visita de tres dardos.',170:'Consigue exactamente 170 puntos en una visita de tres dardos.','125Bull':'Consigue exactamente 125 puntos en una visita de tres dardos, solo con bull.',TopTopTop:'Consigue 120 puntos: tres dobles 20 en una visita de tres dardos.','Todo al 20':'10 rondas y 30 dardos. Registra cada dardo como triple 20, doble 20, sencillo 20 o fallo.'};config('drill',s,s,d[s]+(s==='Todo al 20'?'':' Introduce la suma de los tres dardos; si fallas, repites el objetivo y el contador total continúa.'))}
+function safe(s,f){return (s||'').trim().slice(0,18)||f}
+function startMode(){players=Array.from({length:count},(_,i)=>({name:safe($('p'+(i+1)+'name').value,'Jugador '+(i+1)),score:0,darts:0,throws:[],level:1,lives:3,target:challengeBase,roundDarts:6,roundUsed:0,roundScore:0,turns:0,done:false,finished:false,success:0,clockIndex:0,topHits:0,history:[],bestLevel:1,lastFailedScore:0}));gameEnded=false;challengeTurn=0;
+ if(mode==='challenge'){players.forEach(p=>{p.baseTarget=count===1?100:200;p.target=p.baseTarget;p.roundDarts=6})}
+ if(mode==='501'){players.forEach(p=>{p.remaining=501;p.scored=0;p.visits=0;p.visitScores=[];p.count180=0;p.count140=0;p.count100=0;p.legs=0});bestOf=Number($('bestOf').value||3);legsToWin=Math.ceil(bestOf/2);active501=0;matchFinished=false}
+ if(mode==='clock'){players.forEach(p=>p.clockIndex=0)}
+ if(mode==='drill'){players.forEach(p=>{p.roundScore=0;p.roundDartsUsed=0;p.topHits=0;p.rounds=0;p.t20=0;p.d20=0;p.s20=0;p.miss20=0;p.roundLog=[]})}
+ $('gameMode').textContent=mode==='challenge'?'CONSIGUE EL OBJETIVO':mode==='501'?'501':mode==='clock'?'RELOJITO · '+submode.toUpperCase():submode.toUpperCase();
+ $('gameResult').dataset.done='';$('gameResult').classList.add('hidden');show('game');renderGame()}
+function quitGame(){if(confirm('¿Salir de la partida? El progreso de esta partida no se guardará como marca.'))backToMenu()}
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function saveRecord(p,label,value,unit){let arr=JSON.parse(localStorage.getItem('darts501_history')||'[]');arr.unshift({name:p.name,mode:label,value,unit,date:new Date().toLocaleDateString('es-ES')});localStorage.setItem('darts501_history',JSON.stringify(arr.slice(0,200)))}
+function getRecords(){return JSON.parse(localStorage.getItem('darts501_history')||'[]')}
+function recordButton(){return `<button class="secondary" onclick="openHistory()">📅 Ver historial de marcas</button>`}
+function openHistory(){let a=getRecords();$('historyBody').innerHTML=a.length?`<table class="history"><thead><tr><th>Fecha</th><th>Jugador</th><th>Modo</th><th>Marca</th></tr></thead><tbody>${a.map(x=>`<tr><td>${escapeHTML(x.date)}</td><td>${escapeHTML(x.name)}</td><td>${escapeHTML(x.mode)}</td><td><b>${escapeHTML(x.value+' '+x.unit)}</b></td></tr>`).join('')}</tbody></table>`:'<p class="muted">Todavía no hay marcas guardadas. Completa un entrenamiento para estrenar el historial.</p>' ;show('history')}
+function addDart(i,val,hit=true){let p=players[i];p.throws.push(val);p.darts++;p.score+=val;p.roundScore+=val;if(mode==='drill'&&submode==='TopTopTop'&&hit)p.topHits++;if(mode==='clock'&&hit)p.clockIndex++;renderGame()}
+function renderGame(){if(mode==='501'){render501();return}let info='';
+ if(mode==='challenge')info='';
+ if(mode==='501')info=`<h2>501 · partida en curso</h2><p class="small">Formato de prototipo: resta de puntos por visita de tres dardos. Se muestra media por 3 dardos al finalizar.</p>`;
+ if(mode==='clock')info=`<h2>Relojito · ${submode}</h2><div class="target">${clockTarget(players[0].clockIndex)}</div><p class="small">Objetivo actual · ${players[0].clockIndex>=21?'¡Completado!':'Puntuación necesaria: '+clockTargetScore(players[0].clockIndex)}</p>`;
+ if(mode==='drill'){let p=players[0];info=submode==='Todo al 20'?`<h2>Todo al 20</h2><div class="target">Ronda ${p.rounds}/10</div><p class="small">Dardos lanzados: ${p.darts}/30</p>`:`<h2>${submode}</h2><div class="target">${p.roundScore}/${submode==='TopTopTop'?120:(submode==='125Bull'?125:submode)}</div><p class="small">Dardos totales: ${p.darts} · Visitas: ${Math.floor(p.darts/3)} · Dardos de esta tirada: ${p.roundDartsUsed}/3</p>`;}
+ $('gameInfo').innerHTML=mode==='challenge'?'':info+`<div class="row" style="margin-top:12px">${recordButton()}</div>`;$('gameInfo').classList.toggle('hidden',mode==='challenge');
+ $('gamePlayers').classList.toggle('hidden',false);
+ $('gamePlayers').classList.toggle('clock-duo',mode==='clock'&&count===2);
+ $('gamePlayers').innerHTML=players.map((p,i)=>playerCard(p,i)).join('');
+ players.forEach((p,i)=>wirePlayer(p,i));
+ if(mode==='challenge')checkChallengeEnd();
+ if(mode==='501'&&players.every(p=>p.finished))finish501();
+ if(mode==='clock'&&players.every(p=>p.finished))finishClock();
+ if(mode==='drill'&&players.every(p=>p.finished))finishDrill();
+}
+function record501Visit(i,n){
+ const p=players[i];p.darts+=3;p.visits++;
+ const bust=n>p.remaining;const valid=!bust;
+ p.visitScores.push({score:bust?0:n,shown:n,bust});p.throws.push(bust?'BUST ('+n+')':n);
+ if(!bust){p.remaining-=n;p.scored+=n;if(n===180)p.count180++;else if(n>=140)p.count140++;else if(n>=100)p.count100++;}
+ if(p.remaining===0){p.legs++;if(p.legs>=legsToWin){matchFinished=true;p.finished=true;}else{players.forEach(x=>{x.remaining=501});}}
+ if(count===2&&!matchFinished)active501=1-active501;
+ renderGame();
+}
+function render501(){
+ const legText=players.map(p=>`${escapeHTML(p.name)} ${p.legs}`).join('  ·  ');
+ $('gameInfo').innerHTML=`<div class="legsline">501 · MEJOR DE ${bestOf} · ${legText} · Se necesitan ${legsToWin} victorias</div><div class="turn-label">${matchFinished?'PARTIDA FINALIZADA':count===1?'TU TURNO':'TURNO DE '+escapeHTML(players[active501].name)}</div>`;
+ $('gamePlayers').className='board-grid'+(count===1?' single':'');
+ $('gamePlayers').innerHTML=players.map((p,i)=>{
+  const avg=p.visits?(p.scored/p.visits).toFixed(1):'0.0';
+  const isActive=count===1||i===active501;
+  const visits=p.visitScores.slice().reverse().map((v,j)=>`<div class="board-visit"><span>${p.visitScores.length-j}</span><span>${v.bust?'BUST':v.shown}</span><b>${v.bust?'0':v.shown}</b></div>`).join('')||'<div class="small">Todavía no hay visitas registradas</div>';
+  return `<article class="board-player ${isActive?'active':''}"><div class="dartboard"><div class="score501-name">${escapeHTML(p.name)}</div><div class="score-row"><div class="score501">${p.remaining}</div><div class="dart-counter"><small>DARDOS</small><b>${p.darts}</b><small>${p.visits} VISITAS</small></div></div><div class="board-meta"><span>PARTIDAS: ${p.legs}/${legsToWin}</span><span>3 DARDOS POR VISITA</span></div><div class="board-visits">${visits}</div></div><div class="board-stats"><div class="board-stat"><small>Media / 3</small><strong>${avg}</strong></div><div class="board-stat"><small>180</small><strong>${p.count180}</strong></div><div class="board-stat"><small>140–179</small><strong>${p.count140}</strong></div><div class="board-stat"><small>100–139</small><strong>${p.count100}</strong></div></div>${isActive&&!matchFinished?`<div class="visit-entry"><label for="val${i}">Puntuación de la visita (3 dardos)</label><div class="scoreform"><input id="val${i}" type="number" min="0" max="180" step="1" placeholder="Ej. 100"><button id="add${i}">ANOTAR</button></div><div class="small">Se restará del 501. Si te pasas, la visita será BUST y conservarás tu puntuación.</div></div>`:''}</article>`;
+ }).join('');
+ players.forEach((p,i)=>{if(count===1||i===active501){const b=$('add'+i),v=$('val'+i);if(b&&v){b.onclick=()=>{if(v.value===''||!Number.isInteger(+v.value))return;record501Visit(i,+v.value)};v.addEventListener('keydown',e=>{if(e.key==='Enter')b.click()})}}});
+ if(matchFinished)finish501();
+}
+function clockTarget(n){
+ if(n>=21)return 'FIN';
+ if(n===20)return submode==='Simple'?'BULL':'DOBLE BULL';
+ let k=n+1;
+ return submode==='Simple'?'Sencillo '+k:submode==='Doble'?'Doble '+k:'Triple '+k;
+}
+function clockTargetScore(n){
+ if(n>=21)return null;
+ if(n===20)return submode==='Simple'?25:50;
+ let k=n+1;
+ return submode==='Simple'?k:submode==='Doble'?2*k:3*k;
+}
+function clockVisual(n){
+ const target=clockTarget(n),score=clockTargetScore(n);
+ const order=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+ const cx=120,cy=120;
+ function pt(r,a){let t=(a-90)*Math.PI/180;return [cx+r*Math.cos(t),cy+r*Math.sin(t)]}
+ function wedge(ro,ri,a0,a1){let p1=pt(ro,a0),p2=pt(ro,a1),p3=pt(ri,a1),p4=pt(ri,a0);return `M${p1[0]} ${p1[1]} A${ro} ${ro} 0 0 1 ${p2[0]} ${p2[1]} L${p3[0]} ${p3[1]} A${ri} ${ri} 0 0 0 ${p4[0]} ${p4[1]} Z`}
+ let wanted=n<20?(n+1):null,ring=submode==='Doble'?'double':submode==='Triple'?'triple':'single';
+ let parts='<circle cx="120" cy="120" r="116" fill="#171b1d" stroke="#c5a66b" stroke-width="4"/>';
+ order.forEach((num,i)=>{
+  let a=i*18-9, b=a+18, active=num===wanted;
+  let base=i%2?'#e8dfc7':'#202528';
+  // Outer and inner single beds
+  parts+=`<path d="${wedge(110,64,a,b)}" fill="${active&&ring==='single'?'#ffe34f':base}" stroke="#b8b8a8" stroke-width=".8"/>`;
+  // Triple ring
+  parts+=`<path d="${wedge(64,52,a,b)}" fill="${active&&ring==='triple'?'#fff04a':(i%2?'#b51e32':'#16784b')}" stroke="#d8d0b8" stroke-width=".8"/>`;
+  // Inner single bed
+  parts+=`<path d="${wedge(52,14,a,b)}" fill="${active&&ring==='single'?'#ffe34f':base}" stroke="#b8b8a8" stroke-width=".8"/>`;
+  // Double ring
+  parts+=`<path d="${wedge(110,98,a,b)}" fill="${active&&ring==='double'?'#fff04a':(i%2?'#b51e32':'#16784b')}" stroke="#d8d0b8" stroke-width=".8"/>`;
+  let mid=(a+b)/2, label=pt(84,mid);
+  parts+=`<text x="${label[0]}" y="${label[1]+3}" text-anchor="middle" font-size="9" font-weight="900" fill="${active?'#111':'#f7f0dc'}">${num}</text>`;
+ });
+ // Bull rings, with the requested bull illuminated on the final target
+ let outerBull=submode==='Simple'&&n===20, innerBull=submode!=='Simple'&&n===20;
+ parts+='<circle cx="120" cy="120" r="14" fill="'+(outerBull?'#ffe34f':'#16784b')+'" stroke="#e9ddc0" stroke-width="1"/>';
+ parts+='<circle cx="120" cy="120" r="6" fill="'+(innerBull?'#fff04a':'#b51e32')+'" stroke="#f5e8c9" stroke-width="1"/>';
+ parts+='<circle cx="120" cy="120" r="110" fill="none" stroke="#d8d0b8" stroke-width="1.2"/>';
+ return `<div class="clock-layout"><div class="clock-dartboard"><svg viewBox="0 0 240 240" role="img" aria-label="Diana con el sector ${escapeHTML(target)} iluminado"><defs><filter id="clockGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#clockGlow)">${parts}</g></svg></div><div class="clock-target-copy"><strong>${escapeHTML(target)}</strong><span>${n>=21?'¡Reto completado!':'Zona iluminada · '+score+' puntos'}</span></div></div>`;
+}
+function playerCard(p,i){
+ let inputLabel=mode==='501'?'Puntos de esta visita (0–180)':mode==='challenge'?'Suma de los tres dardos (0–180)':mode==='drill'&&submode!=='Todo al 20'?'Suma de los tres dardos (0–180)':'Resultado del dardo';
+ let status=mode==='501'?`Restante: <b>${p.remaining}</b>`:mode==='challenge'?`Nivel ${p.level} · ${'♥'.repeat(p.lives)}${'♡'.repeat(3-p.lives)}`:mode==='clock'?`Progreso: ${p.clockIndex}/21`:mode==='drill'?`Dardos: ${p.darts} · Tirada: ${p.roundDartsUsed}/3 · Puntos: ${p.roundScore}`:'';
+ let extra=mode==='clock'&&!p.finished?clockVisual(p.clockIndex):'';
+ let pct=mode==='challenge'?Math.min(100,p.roundScore/p.target*100):0;
+ let cheer=pct>=90?'🔥 ¡ESTÁS A UN PASO!':pct>=70?'💥 ¡YA CASI LO TIENES!':pct>=45?'⚡ ¡VAS POR MUY BUEN CAMINO!':pct>=20?'🎯 ¡BUEN COMIENZO, SIGUE!':'🚀 ¡A POR EL OBJETIVO!';
+ let challengePanel=mode==='challenge'?`<div class="challenge-arena">
+   <div class="challenge-topline"><span>NIVEL ${p.level}</span><span class="challenge-lives">${'♥'.repeat(p.lives)}${'♡'.repeat(3-p.lives)}</span></div>
+   <div class="challenge-target-number">${p.target}</div><div class="challenge-target-caption">PUNTOS PARA SUPERAR EL NIVEL</div>
+   <div class="challenge-current"><span>Tu puntuación</span><b>${p.roundScore}</b><span>/ ${p.target}</span></div>
+   <div class="challenge-track"><div class="challenge-track-fill" style="width:${pct}%"></div><div class="challenge-ticks"><i></i><i></i><i></i></div><span class="challenge-marker" style="left:${Math.max(2,Math.min(98,pct))}%">🎯</span></div>
+   <div class="challenge-encourage">${cheer}</div>
+   <div class="challenge-meta"><span>Visitas: ${Math.floor(p.roundUsed/3)} / ${Math.floor(p.roundDarts/3)}</span><b>Quedan ${Math.max(0,Math.floor((p.roundDarts-p.roundUsed)/3))} visitas</b></div>
+  </div>`:'';
+ let todoCounters=mode==='drill'&&submode==='Todo al 20'?`<div class="todo20-counters"><div class="todo20-counter triple"><small>Triple 20</small><b>${p.t20}</b></div><div class="todo20-counter double"><small>Doble 20</small><b>${p.d20}</b></div><div class="todo20-counter single"><small>Single 20</small><b>${p.s20}</b></div><div class="todo20-counter miss"><small>Fuera</small><b>${p.miss20}</b></div></div>`:'';
+ let ph=mode==='501'?'Puntos de la visita':inputLabel;
+ let header=`<div class="row between"><h3>${escapeHTML(p.name)}</h3>${mode==='challenge'?'':`<span class="pill">${status}</span>`}</div>`;
+ let normalStats=mode==='challenge'?'':`<div class="stats"><div class="stat"><small>Dardos</small><b>${p.darts}</b></div><div class="stat"><small>${mode==='501'?'Restante':'Puntos'}</small><b>${mode==='501'?p.remaining:p.score}</b></div><div class="stat"><small>Marca</small><b>${mode==='clock'?p.clockIndex+'/21':mode==='drill'&&submode==='TopTopTop'?p.topHits+'/3':'—'}</b></div></div>`;
+ let throws=mode==='challenge'?'':`<div class="throws">${p.throws.map((v,j)=>`<span class="dart">${mode==='501'?'Visita':'D'+(j+1)}: ${v}</span>`).join('')||'<span class="small">Sin lanzamientos todavía</span>'}</div>`;
+ let entry='';
+ if(p.finished)entry='<div class="notice good">Jugador eliminado.</div>';
+ else if(mode==='challenge')entry=`<div class="challenge-entry"><label for="val${i}">Introduce la suma de tus 3 dardos</label><div class="scoreform"><input id="val${i}" type="number" min="0" max="180" step="1" placeholder="0 – 180"><button id="add${i}">ANOTAR VISITA</button></div></div>`;
+ else if(mode==='drill'&&submode==='Todo al 20')entry=`<label>Puntuación del dardo ${p.roundDartsUsed%3+1} · Ronda ${p.rounds+1}/10</label><div class="scoreform"><input id="val${i}" type="number" min="0" max="60" step="1" placeholder="Ej. 60, 40, 20"><button id="add${i}">Añadir dardo</button></div><div class="small">La app clasificará automáticamente: 60 = T20 · 40 = D20 · 20 = S20 · cualquier otro resultado = fallo.</div>`;
+ else entry=`<label>${ph}</label><div class="scoreform"><input id="val${i}" type="number" min="0" max="${mode==='501'?180:180}" step="1" placeholder="${submode==='TopTopTop'?120:submode==='125Bull'?125:submode}"><button id="add${i}">${mode==='501'?'Añadir visita':'Añadir visita'}</button></div>`;
+ return `<article class="player ${mode==='challenge'?'challenge-player':''}">${header}${extra}${todoCounters}${challengePanel}${normalStats}${throws}${entry}</article>`;
+}
+function wirePlayer(p,i){if(p.finished)return;let b=$('add'+i),v=$('val'+i);b.onclick=()=>{if(v.value==='')return;if(!(mode==='drill'&&submode==='Todo al 20')&&!Number.isInteger(+v.value))return;let n=Number(v.value);if(mode==='501'){if(n<0||n>180||matchFinished)return;if(count===2&&i!==active501)return;record501Visit(i,n);return}
+ if(n<0||n>(mode==='challenge'?180:mode==='drill'&&submode==='Todo al 20'?60:mode==='drill'?180:60))return;
+ if(mode==='challenge'){if(gameEnded||p.finished)return;if(n>180)return;p.throws.push(n);p.darts+=3;p.roundUsed+=3;p.roundScore+=n;p.score=p.roundScore;if(p.roundScore>=p.target){let exact=p.roundScore===p.target;p.level++;p.bestLevel=Math.max(p.bestLevel,p.level);if(exact)p.lives=Math.min(3,p.lives+1);p.target=targetNext(p.level,p.baseTarget);p.roundDarts=6+3*(p.level-1);p.roundUsed=0;p.roundScore=0;p.throws=[];p.score=0;}else if(p.roundUsed>=p.roundDarts){p.lastFailedScore=p.roundScore;p.lives--;p.roundUsed=0;p.roundScore=0;p.throws=[];p.score=0;if(p.lives<=0){p.finished=true;p.bestLevel=p.level;p.level=1;}}checkChallengeEnd();renderGame();return}
+ if(mode==='clock'){p.throws.push(n);p.darts++;p.score+=n;if(n===clockTargetScore(p.clockIndex))p.clockIndex++;if(p.clockIndex>=21)p.finished=true;renderGame();return}
+ if(mode==='drill'){
+  if(submode==='Todo al 20'){
+   if(!Number.isInteger(n)||n<0||n>60)return;
+   p.darts++;p.roundDartsUsed++;
+   let zone=n===60?'T20':n===40?'D20':n===20?'S20':'FALLO';
+   p.throws.push(n+' ('+zone+')');
+   if(zone==='T20')p.t20++;else if(zone==='D20')p.d20++;else if(zone==='S20')p.s20++;else p.miss20++;
+   if(p.roundDartsUsed===3){p.rounds++;p.roundDartsUsed=0;}
+   if(p.darts>=30){p.finished=true;saveRecord(p,'Todo al 20',`T20 ${p.t20} · D20 ${p.d20} · S20 ${p.s20} · Fallos ${p.miss20}`,'30 dardos')}
+   renderGame();return;
+  }
+  if(n<0||n>180)return;
+  p.throws.push(n);p.darts+=3;p.roundDartsUsed=3;p.roundScore=n;p.score+=n;
+  let target=submode==='125Bull'?125:submode==='TopTopTop'?120:Number(submode);
+  if(n===target){p.finished=true;saveRecord(p,submode,n,p.darts+' dardos');p.success=n;}
+  else{p.roundScore=0;p.roundDartsUsed=0;}
+  renderGame();return;
+ }
+ };v.addEventListener('keydown',e=>{if(e.key==='Enter')b.click()})}
+function targetNext(l,base=100){let lo=base+30*(l-1),hi=base+50*(l-1);return Math.floor(Math.random()*(hi-lo+1))+lo}
+function checkChallengeEnd(){if(gameEnded)return;if(count===1){if(players[0].finished)finishChallenge(0,'single');return}let [a,b]=players;if(a.finished&&b.finished){if(a.bestLevel!==b.bestLevel)finishChallenge(a.bestLevel>b.bestLevel?0:1,'level');else if(a.lastFailedScore!==b.lastFailedScore)finishChallenge(a.lastFailedScore>b.lastFailedScore?0:1,'score');else finishChallenge(-1,'tie');return}if(a.finished&&b.level>a.bestLevel){finishChallenge(1,'overtake');return}if(b.finished&&a.level>b.bestLevel){finishChallenge(0,'overtake');return}}
+function finishChallenge(winner,reason){if(gameEnded)return;gameEnded=true;$('gameResult').classList.remove('hidden');let summary=players.map(p=>`<p><b>${escapeHTML(p.name)}</b> · Nivel alcanzado: ${p.bestLevel||p.level} · Vidas restantes: ${p.lives} · Último intento: ${p.lastFailedScore||0}/${p.target}</p>`).join('');let heading=count===1?'Fin de partida':winner<0?'¡Empate!':`🏆 ¡Gana ${escapeHTML(players[winner].name)}!`;let detail=reason==='single'?'Has perdido las 3 vidas.':reason==='score'?'Ambos habéis terminado en el mismo nivel; gana quien más puntos sumó en su último intento.':reason==='tie'?'Los dos habéis terminado en el mismo nivel y con la misma puntuación en el último intento.':'La partida termina cuando un jugador queda eliminado y el otro supera su nivel.';$('gameResult').innerHTML=`<h2>${heading}</h2><p>${detail}</p>${summary}<button onclick="home()">Volver al inicio</button>`}
+function finish501(){if($('gameResult').dataset.done==='1')return;$('gameResult').dataset.done='1';$('gameResult').classList.remove('hidden');$('gameResult').innerHTML=`<h2>🏆 ¡Partida 501 finalizada!</h2><p>${escapeHTML(players.find(p=>p.legs>=legsToWin)?.name||'Ganador')} gana el mejor de ${bestOf} (${legsToWin} partidas necesarias).</p>${players.map(p=>`<p><b>${escapeHTML(p.name)}</b> · ${p.legs} partidas ganadas · media ${p.visits?(p.scored/p.visits).toFixed(1):'0.0'} · 180: ${p.count180} · 140+: ${p.count140} · 100+: ${p.count100}</p>`).join('')}<button onclick="home()">Volver al inicio</button>`}
+function finishClock(){players.forEach(p=>saveRecord(p,'Relojito '+submode,p.darts,'dardos'));$('gameResult').classList.remove('hidden');$('gameResult').innerHTML=`<h2>¡Relojito completado!</h2>${players.map(p=>`<p>${escapeHTML(p.name)}: ${p.darts} dardos</p>`).join('')}<button onclick="home()">Volver al inicio</button>`}
+function finishDrill(){ $('gameResult').classList.remove('hidden');$('gameResult').innerHTML=players.map(p=>submode==='Todo al 20'?`<div class="achievement"><div class="achievement-title">¡ENTRENAMIENTO COMPLETADO!</div><div class="achievement-score">30 DARDOS</div><div class="achievement-darts">${escapeHTML(p.name)} · 10 rondas</div><div class="achievement-stats">${escapeHTML(p.name)} · Recuento de los 30 dardos</div><div class="todo20-result-grid"><div class="todo20-result triple"><small>Triple 20</small><b>${p.t20}</b></div><div class="todo20-result double"><small>Doble 20</small><b>${p.d20}</b></div><div class="todo20-result single"><small>Single 20</small><b>${p.s20}</b></div><div class="todo20-result miss"><small>Fuera</small><b>${p.miss20}</b></div></div></div>`:`<div class="achievement"><div class="achievement-title">¡LOGRADO!</div><div class="achievement-score">${p.success}</div><div class="achievement-darts">Conseguido en ${p.darts} dardos</div></div>`).join('')+`<button onclick="home()">Volver al inicio</button>`}
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+import { getDatabase, ref, set, get, onValue, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-database.js";
+const firebaseConfig = {
+ apiKey: "AIzaSyA9Ese9qVC0FIAPE67eHM9RRtezsp3P24Y",
+ authDomain: "darts-501-challenge.firebaseapp.com",
+ databaseURL: "https://darts-501-challenge-default-rtdb.europe-west1.firebasedatabase.app",
+ projectId: "darts-501-challenge",
+ storageBucket: "darts-501-challenge.firebasestorage.app",
+ messagingSenderId: "252295677067",
+ appId: "1:252295677067:web:4616707e01d7602066008e"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+let uid = null, currentRoom = null, roomUnsub = null, selectedOnlineMode = null;
+const $ = id => document.getElementById(id);
+const modeNames = {'challenge':'Consigue el objetivo','501':'501','clock-simple':'Relojito Simple','clock-double':'Relojito Doble','clock-triple':'Relojito Triple','drill-180':'Entrenamiento 180','drill-170':'Entrenamiento 170','drill-125Bull':'125 Bull','drill-TopTopTop':'Top Top Top','drill-Todo al 20':'Todo al 20'};
+const status = (msg, bad=false) => { const el=$('onlineStatus'); if(el){el.textContent=msg;el.classList.toggle('bad',bad);el.classList.toggle('good',!bad);} };
+onAuthStateChanged(auth, user => { if(user){uid=user.uid;status('Conectado como jugador invitado. Ya puedes crear o unirte a una sala.');} });
+signInAnonymously(auth).catch(e=>status('No se pudo iniciar sesión: '+e.message,true));
+function code(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let out='';for(let i=0;i<6;i++)out+=chars[Math.floor(Math.random()*chars.length)];return out;}
+function cleanName(){return (($('onlineName').value||'Jugador').trim().slice(0,18)||'Jugador');}
+function showRoom(data){
+ $('roomPanel').classList.remove('hidden');
+ $('roomCode').textContent=currentRoom||'';
+ $('roomModeLabel').textContent='Modalidad: '+(modeNames[data.gameMode]||data.gameMode||'Sin definir');
+ const ps=Object.values(data.players||{});
+ $('roomPlayers').innerHTML=ps.map((p,i)=>`<div class="row between"><b>${String(p.name||'Jugador').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</b><span class="pill">${i===0?'Anfitrión':'Invitado'}</span></div>`).join('');
+ $('roomHint').textContent=ps.length<2?'Esperando al segundo jugador…':'¡Los dos móviles están conectados! Modalidad confirmada; la sincronización de juego llegará en la siguiente fase.';
+ $('roomTitle').textContent=ps.length===2?'Sala completa':'Sala creada';
+}
+async function watchRoom(codeValue){
+ if(roomUnsub)roomUnsub();
+ currentRoom=codeValue;
+ roomUnsub=onValue(ref(db,'rooms/'+codeValue),snap=>{
+  if(!snap.exists()){status('La sala ya no existe.',true);return;}
+  showRoom(snap.val());
+ },err=>status('Error leyendo sala: '+err.message,true));
+}
+window.openOnline=()=>{selectedOnlineMode=null;$('onlineActions').classList.add('hidden');$('roomPanel').classList.add('hidden');document.querySelectorAll('#onlineModes .tile').forEach(x=>x.classList.remove('sel'));show('online');};
+window.selectOnlineMode=(mode,el)=>{selectedOnlineMode=mode;document.querySelectorAll('#onlineModes .tile').forEach(x=>x.classList.toggle('sel',x===el));$('onlineActions').classList.remove('hidden');$('roomPanel').classList.add('hidden');status('Modalidad elegida: '+modeNames[mode]+'. Ahora crea una sala o introduce un código.');};
+window.createOnlineRoom=async()=>{
+ if(!uid){status('Conectando con Firebase. Espera unos segundos.',true);return;}
+ if(!selectedOnlineMode){status('Elige primero una modalidad de juego.',true);return;}
+ try{
+  let c=code();let room={createdAt:Date.now(),status:'waiting',host:uid,gameMode:selectedOnlineMode,players:{[uid]:{name:cleanName(),joinedAt:Date.now()}},game:null};
+  await set(ref(db,'rooms/'+c),room);await watchRoom(c);status('Sala creada. Comparte el código con tu rival.');
+ }catch(e){status('No se pudo crear la sala: '+e.message,true);}
+};
+window.joinOnlineRoom=async()=>{
+ if(!uid){status('Conectando con Firebase. Espera unos segundos.',true);return;}
+ let c=($('joinCode').value||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+ if(c.length!==6){status('Introduce un código de 6 caracteres.',true);return;}
+ try{
+  const r=ref(db,'rooms/'+c),snap=await get(r);
+  if(!snap.exists()){status('No existe ninguna sala con ese código.',true);return;}
+  const room=snap.val(), players=room.players||{};
+  if(selectedOnlineMode && room.gameMode && selectedOnlineMode!==room.gameMode){status('La sala es de '+(modeNames[room.gameMode]||room.gameMode)+'. Selecciona esa misma modalidad para unirte.',true);return;}
+  selectedOnlineMode=room.gameMode||selectedOnlineMode;
+  document.querySelectorAll('#onlineModes .tile').forEach(x=>x.classList.toggle('sel',x.dataset.mode===selectedOnlineMode));$('onlineActions').classList.remove('hidden');
+  if(players[uid]){await watchRoom(c);return;}
+  if(Object.keys(players).length>=2){status('La sala ya está completa.',true);return;}
+  await update(r,{['players/'+uid]:{name:cleanName(),joinedAt:Date.now()},status:'ready'});
+  await watchRoom(c);status('Te has unido a la sala.');
+ }catch(e){status('No se pudo entrar: '+e.message,true);}
+};
+window.copyRoomCode=async()=>{try{await navigator.clipboard.writeText(currentRoom);status('Código copiado. Envíalo a tu rival.');}catch(e){status('Código de invitación: '+currentRoom);}};
+window.leaveOnlineRoom=()=>{if(roomUnsub)roomUnsub();roomUnsub=null;currentRoom=null;$('roomPanel').classList.add('hidden');status('Has salido de la sala. Puedes elegir otra modalidad o volver a entrar.');};
+</script>
+
+</body></html>
